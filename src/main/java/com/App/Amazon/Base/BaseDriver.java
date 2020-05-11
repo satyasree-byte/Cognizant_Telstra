@@ -9,6 +9,8 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.Reporter;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Listeners;
@@ -26,10 +28,10 @@ public class BaseDriver {
 	public static AppiumDriver<MobileElement> driver;
 
 	@BeforeTest
-	public void MagicStudio() {
+	public void Base() {
 
 		try {
-			
+			Reporter.log("================Browser Session Started===============",true);
 			DesiredCapabilities capabilities = new DesiredCapabilities();
 			capabilities.setCapability("no", true);
 			capabilities.setCapability("newCommandTimeout", 100000);
@@ -52,7 +54,7 @@ public class BaseDriver {
 			
 			URL url = new URL(TestDataReader.getValue("BasePortURL"));
 			driver = new AndroidDriver<MobileElement>(url, capabilities);
-
+			Reporter.log("===============Application Started================",true);
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			
 
@@ -65,11 +67,20 @@ public class BaseDriver {
 	}
 
 	@AfterTest
-	public void tearDown() {
-		driver.quit();
+	public void closeDriver() {
+		driver.close();
+		Reporter.log("================Application Ended=====================", true);
 
 	}
 
+	@AfterSuite
+	public void tearDown() {
+		driver.quit();
+		Reporter.log("==================Browser Session End=================", true);
+
+	}
+
+// Works as per listener and takes screenshots when failed.
 	public void failed(String TestName) {
 
 		try {
